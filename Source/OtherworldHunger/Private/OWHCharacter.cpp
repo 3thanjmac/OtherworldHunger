@@ -89,6 +89,9 @@ void AOWHCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AOWHCharacter::Look);
+
+		//Jumping
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 	}
 }
 
