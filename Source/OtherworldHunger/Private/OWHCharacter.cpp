@@ -114,11 +114,6 @@ void AOWHCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
-void AOWHCharacter::StopMove(const FInputActionValue& Value)
-{
-	//StopSFX(FootStepsTag);
-}
-
 void AOWHCharacter::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
