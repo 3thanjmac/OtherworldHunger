@@ -85,7 +85,6 @@ void AOWHCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	{
 		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AOWHCharacter::Move);
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AOWHCharacter::StopMove);
 
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AOWHCharacter::Look);
