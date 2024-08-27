@@ -20,16 +20,23 @@ bool UOWHGameplayAbility_Climb::CanActivateAbility(const FGameplayAbilitySpecHan
 		{
 			return false;
 		}
-		else if (OwnerCharacter->GetCharacterMovement()->IsFalling() == true)
-		{
-			return false;
-		}
 
 		FVector StartTrace = OwnerCharacter->GetActorLocation();
 		FVector EndTrace = StartTrace + OwnerCharacter->GetActorForwardVector() * AttachmentDistance;
+		FVector OffsetTrace = OwnerCharacter->GetActorForwardVector() * 50;
+
+		FHitResult InitCollision;
+		OwnerCharacter->GetWorld()->LineTraceSingleByChannel(InitCollision, StartTrace + OffsetTrace, EndTrace + OffsetTrace, ECC_Camera);
+
+		if (InitCollision.bBlockingHit == false)
+		{
+			// Testing if there's any collision at all (via Camera trace channel)
+			return false;
+		}
+
+		//DrawDebugLine(GetWorld(), StartTrace + OffsetTrace, EndTrace + OffsetTrace, FColor::Red, false, 5.0f);
 
 		FHitResult HitResult;
-
 		OwnerCharacter->GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Visibility);
 
 		if (HitResult.bBlockingHit == false)
