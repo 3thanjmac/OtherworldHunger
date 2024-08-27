@@ -221,16 +221,20 @@ void AOWHCharacter::ShowConfirmation(FString Message, FString LevelName)
 
 void AOWHCharacter::PauseGame()
 {
-		OWHController->SetShowMouseCursor(true);
-		UGameplayStatics::SetGamePaused(GetWorld(), true);
-		UGameplayStatics::SetViewportMouseCaptureMode(GetWorld(), EMouseCaptureMode::NoCapture);
+	FInputModeUIOnly UIOnly;
+	OWHController->SetShowMouseCursor(true);
+	OWHController->SetInputMode(UIOnly);
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
+	UGameplayStatics::SetViewportMouseCaptureMode(GetWorld(), EMouseCaptureMode::NoCapture);
 }
 
 void AOWHCharacter::ResumeGame()
 {
-		OWHController->SetShowMouseCursor(false);
-		UGameplayStatics::SetGamePaused(GetWorld(), false);
-		UGameplayStatics::SetViewportMouseCaptureMode(GetWorld(), EMouseCaptureMode::CapturePermanently);
+	FInputModeGameOnly GameOnly;
+	OWHController->SetShowMouseCursor(false);
+	OWHController->SetInputMode(GameOnly);
+	UGameplayStatics::SetGamePaused(GetWorld(), false);
+	UGameplayStatics::SetViewportMouseCaptureMode(GetWorld(), EMouseCaptureMode::CapturePermanently);
 }
 
 void AOWHCharacter::PlaySFX(const FGameplayTag& AudioTag)
