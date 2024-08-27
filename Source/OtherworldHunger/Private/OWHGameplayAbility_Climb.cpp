@@ -11,6 +11,7 @@
 #include "OWHCharacter.h"
 #include "AbilitySystemGlobals.h"
 #include "OWHAbilitySystemComponent.h"
+#define Climbable ECC_GameTraceChannel1
 
 bool UOWHGameplayAbility_Climb::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags /* = nullptr */, const FGameplayTagContainer* TargetTags /* = nullptr */, OUT FGameplayTagContainer* OptionalRelevantTags /* = nullptr */) const
 {
@@ -23,26 +24,24 @@ bool UOWHGameplayAbility_Climb::CanActivateAbility(const FGameplayAbilitySpecHan
 
 		FVector StartTrace = OwnerCharacter->GetActorLocation();
 		FVector EndTrace = StartTrace + OwnerCharacter->GetActorForwardVector() * AttachmentDistance;
-		FVector OffsetTrace = OwnerCharacter->GetActorForwardVector() * 50;
-
-		FHitResult InitCollision;
-		OwnerCharacter->GetWorld()->LineTraceSingleByChannel(InitCollision, StartTrace + OffsetTrace, EndTrace + OffsetTrace, ECC_Camera);
-
-		if (InitCollision.bBlockingHit == false)
-		{
-			// Testing if there's any collision at all (via Camera trace channel)
-			return false;
-		}
-
-		//DrawDebugLine(GetWorld(), StartTrace + OffsetTrace, EndTrace + OffsetTrace, FColor::Red, false, 5.0f);
-
 		FHitResult HitResult;
+
 		OwnerCharacter->GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Visibility);
 
 		if (HitResult.bBlockingHit == false)
 		{
-			OwnerCharacter->ShowNotification("Can't Climb Here", ENotificationType::EError);
 			return false;
+		}
+		else
+		{
+			FHitResult ClimbTest;
+			OwnerCharacter->GetWorld()->LineTraceSingleByChannel(ClimbTest, StartTrace, EndTrace, Climbable);
+
+			if (ClimbTest.bBlockingHit == false)
+			{
+				OwnerCharacter->ShowNotification("Can't Climb Here", ENotificationType::EError);
+				return false;
+			}
 		}
 	}
 

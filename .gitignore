@@ -80,3 +80,4 @@ DerivedDataCache/*
 .DS_Store
 OtherworldHunger.code-workspace
 .ignore
+/Mac
