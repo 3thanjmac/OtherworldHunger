@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Components/CapsuleComponent.h"
 #include "InputActionValue.h"
 #include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
@@ -20,6 +21,7 @@ class OTHERWORLDHUNGER_API AOWHCharacter : public ACharacter, public IAbilitySys
 public:
 	AOWHCharacter();
 
+	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	/** Recipe */
@@ -71,6 +73,11 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	FGameplayTag Climb;
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivateAccess = "true"))
 	class UOWHCharacterInventory* CharacterInventory;
@@ -87,7 +94,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ability, meta = (AllowPrivateAccess = "true"))
 	class UAbilitySystemComponent* AbilitySystemComponent;
 
-	/** Ability system comp */
+	/** Quest Manager comp */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Recipe, meta = (AllowPrivateAccess = "true"))
 	UOWHQuestsManager* QuestManagerComponent;
 

@@ -2,23 +2,23 @@
 
 
 #include "OWHCharacter.h"
+#include "Abilities/GameplayAbility.h"
+#include "Actors/OWHIngredient.h"
+#include "Camera/CameraComponent.h"
+#include "EngineUtils.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "Camera/CameraComponent.h"
-#include "OWHAbilitySystemComponent.h"
-#include "Abilities/GameplayAbility.h"
-#include "GameplayAbilitySpec.h"
+#include "OWHAudioManager.h"
+#include "OWHPlayerHUD.h"
 #include "OWHGameplayAbility_Climb.h"
 #include "OWHGameplayAbility_Interact.h"
 #include "OWHInteractableInterface.h"
-#include "Actors/OWHIngredient.h"
+#include "OWHAbilitySystemComponent.h"
+#include "GameplayAbilitySpec.h"
 #include "Components/OWHCharacterInventory.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "OWHPlayerHUD.h"
-#include "OWHAudioManager.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "EngineUtils.h"
 
 AOWHCharacter::AOWHCharacter()
 {
@@ -45,6 +45,12 @@ AOWHCharacter::AOWHCharacter()
 
 	CharacterInventory = CreateDefaultSubobject<UOWHCharacterInventory>(TEXT("CharacterInventoryComp"));
 	PrimaryActorTick.bCanEverTick = true;
+}
+
+void AOWHCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AOWHCharacter::OnHit);
 }
 
 void AOWHCharacter::PossessedBy(AController* NewController)
@@ -124,6 +130,13 @@ void AOWHCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void AOWHCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (!bIsClimbing)
+	{
+		GetOWHAbilitySystemComponent()->ActivateAbilityByTag(Climb);
+	}
+}
 
 UOWHCharacterInventory* AOWHCharacter::GetCharacterInventory() const
 {
