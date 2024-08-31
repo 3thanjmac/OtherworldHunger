@@ -78,6 +78,9 @@ protected:
 
 	FGameplayTag Climb;
 
+	UPROPERTY(EditAnywhere, Category = Ability, meta = (AllowPrivateAccess = "true"))
+	const class UBasicAttributeSet* Attributes;
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivateAccess = "true"))
 	class UOWHCharacterInventory* CharacterInventory;

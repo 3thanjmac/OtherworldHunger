@@ -4,6 +4,7 @@
 #include "OWHCharacter.h"
 #include "Abilities/GameplayAbility.h"
 #include "Actors/OWHIngredient.h"
+#include "BasicAttributeSet.h"
 #include "Camera/CameraComponent.h"
 #include "EngineUtils.h"
 #include "EnhancedInputComponent.h"
@@ -51,6 +52,11 @@ void AOWHCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AOWHCharacter::OnHit);
+
+	if (IsValid(AbilitySystemComponent))
+	{
+		Attributes = AbilitySystemComponent->GetSet<UBasicAttributeSet>();
+	}
 }
 
 void AOWHCharacter::PossessedBy(AController* NewController)
