@@ -63,6 +63,10 @@ public:
 	void SetPlayerHUD(UUserWidget* InPlayerHUD);
 	void SetIsClimbing(bool climbing);
 
+	/** Fall Damage */
+	UFUNCTION(BlueprintCallable)
+	float FallDamage(float Velocity);
+
 protected:
 	virtual void PossessedBy(AController* NewController) override;
 
@@ -78,7 +82,7 @@ protected:
 
 	FGameplayTag Climb;
 
-	UPROPERTY(EditAnywhere, Category = Ability, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS", meta = (AllowPrivateAccess = "true"))
 	const class UBasicAttributeSet* Attributes;
 
 private:
@@ -94,7 +98,7 @@ private:
 	class UCameraComponent* FollowCamera;
 
 	/** Ability system comp */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ability, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Ability, meta = (AllowPrivateAccess = "true"))
 	class UAbilitySystemComponent* AbilitySystemComponent;
 
 	/** Quest Manager comp */

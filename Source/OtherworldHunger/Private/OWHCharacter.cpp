@@ -269,3 +269,12 @@ void AOWHCharacter::StopSFX(const FGameplayTag& AudioTag)
 
 	AudioManager->StopSound(AudioTag);
 }
+
+float AOWHCharacter::FallDamage(float Velocity)
+{
+	/* Min velocity for fall damage set by addend */
+	Velocity = (Velocity + 1600) * 0.1;
+	/* Exponential calculation */
+	Velocity = FMath::Pow(Velocity, 2) * -0.005;
+	return FMath::RoundToInt(Velocity);
+}
