@@ -10,6 +10,7 @@
 #include "OWHAbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "Components/CapsuleComponent.h"
+//#include "Dialogues/OWHDialogueInterface.h"
 
 
 bool UOWHGameplayAbility_Interact::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags,
@@ -22,22 +23,21 @@ bool UOWHGameplayAbility_Interact::CanActivateAbility(const FGameplayAbilitySpec
 
 	if (OverlappingActors.Num() == 0) { return false; }
 
-	bool FrontItemFound = false;
+	bool bFrontItemFound = false;
 	for (AActor* Interactable : OverlappingActors)
 	{
-		FVector Dir = Interactable->GetActorLocation() - (OwnerCharacter->GetActorLocation() - (OwnerCharacter->GetActorUpVector() * OwnerCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight()));
-		Dir.Normalize();
+		const FVector CharacterToActorDirection = (Interactable->GetActorLocation() - OwnerCharacter->GetActorLocation()).GetSafeNormal2D();
+		const float DotProduct = FVector::DotProduct(OwnerCharacter->GetActorForwardVector(), CharacterToActorDirection);
 
-		float DotProduct = FVector::DotProduct(OwnerCharacter->GetActorForwardVector(), Dir);
-
-		if (DotProduct > 0)
+		// Only if Player is facing the interactable and implements either if Interactable or Dialogue Interaface.
+		if (DotProduct > 0.0f)
 		{
-			FrontItemFound = true;
+			bFrontItemFound = true;
 			break;
 		}
 	}
 
-	if (FrontItemFound == false)
+	if (!bFrontItemFound)
 	{
 		return false;
 	}
@@ -65,33 +65,36 @@ void UOWHGameplayAbility_Interact::EndAbility(const FGameplayAbilitySpecHandle H
 void UOWHGameplayAbility_Interact::DoInteract(ACharacter* OwnerCharacter)
 {
 	AOWHCharacter* OWHCharacter = Cast<AOWHCharacter>(OwnerCharacter);
+	if (!OWHCharacter)
+	{
+		K2_CancelAbility();
+		return;
+	}
 
 	TArray<AActor*> OverlappingActors;
 	OWHCharacter->GetOverlappingActors(OverlappingActors, UOWHInteractableInterface::StaticClass());
+
 	for (AActor* Actor : OverlappingActors)
 	{
 		if (Actor)
 		{
-			if (IOWHInteractableInterface* Interactable = Cast<IOWHInteractableInterface>(Actor))
+			const FVector CharacterToActorDirection = (Actor->GetActorLocation() - OwnerCharacter->GetActorLocation()).GetSafeNormal2D();
+			const float DotProduct = FVector::DotProduct(OwnerCharacter->GetActorForwardVector(), CharacterToActorDirection);
+
+			if (DotProduct > 0.0f)
 			{
-				FVector Dir = Actor->GetActorLocation() - (OwnerCharacter->GetActorLocation() - (OwnerCharacter->GetActorUpVector() * OwnerCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight()));
-				Dir.Normalize();
-
-				float DotProduct = FVector::DotProduct(OwnerCharacter->GetActorForwardVector(), Dir);
-
-				if (DotProduct > 0)
+				if (IOWHInteractableInterface* Interactable = Cast<IOWHInteractableInterface>(Actor))
 				{
-					Interactable->Interact_Implementation(OWHCharacter);
-					//break;
+					Interactable->Interact_Implementation(OWHCharacter); 
 				}
-			}
-			else if (Actor->ActorHasTag("SkystoneLevel"))
-			{
-				OWHCharacter->ShowConfirmation("Go to the Dunes of Skystone?", "Skystones");
-			}
-			else if (Actor->ActorHasTag("SwampLevel"))
-			{
-				OWHCharacter->ShowConfirmation("Go to the Forgotten Swamp?", "ForgottenSwamp");
+				else if (Actor->ActorHasTag("SkystoneLevel"))
+				{
+					OWHCharacter->ShowConfirmation("Go to the Dunes of Skystone?", "Skystones");
+				}
+				else if (Actor->ActorHasTag("SwampLevel"))
+				{
+					OWHCharacter->ShowConfirmation("Go to the Forgotten Swamp?", "ForgottenSwamp");
+				}
 			}
 		}
 	}

@@ -20,6 +20,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Dialogues/OWHDialogueComponent.h"
 
 AOWHCharacter::AOWHCharacter()
 {
@@ -37,6 +38,8 @@ AOWHCharacter::AOWHCharacter()
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 
 	QuestManagerComponent = CreateDefaultSubobject<UOWHQuestsManager>(TEXT("QuestManagerComp"));
+
+	DialogueComponent = CreateDefaultSubobject<UOWHDialogueComponent>(TEXT("DialogueComponent"));
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;

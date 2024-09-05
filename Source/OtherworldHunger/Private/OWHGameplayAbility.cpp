@@ -61,7 +61,7 @@ void UOWHGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, co
 
 void UOWHGameplayAbility::OnInputStatusChanged(const FInputActionValue& Value)
 {
-	if (UOWHAbilitySystemComponent* OwningAbilityComponent = Cast<UOWHAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwningActorFromActorInfo())))
+	if (UOWHAbilitySystemComponent* OwningAbilityComponent = Cast<UOWHAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo()))
 	{
 		if (AbilityTags.GetByIndex(0).IsValid())
 		{

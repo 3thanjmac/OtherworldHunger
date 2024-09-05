@@ -13,6 +13,8 @@
 #include "OWHConfirmUIScreen.h"
 #include "OWHCharacter.generated.h"
 
+class UOWHDialogueComponent;
+
 UCLASS()
 class OTHERWORLDHUNGER_API AOWHCharacter : public ACharacter, public IAbilitySystemInterface
 {
@@ -46,6 +48,7 @@ public:
 	class UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
 	class UOWHCharacterInventory* GetCharacterInventory() const;
 	UOWHQuestsManager* GetQuestsManager() const { return QuestManagerComponent; }
+	UOWHDialogueComponent* GetDialogueComponent() const { return DialogueComponent; }
 	class AOWHAudioManager* GetAudioManager();
 	class UOWHAbilitySystemComponent* GetOWHAbilitySystemComponent() const;
 
@@ -104,6 +107,10 @@ private:
 	/** Quest Manager comp */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Recipe, meta = (AllowPrivateAccess = "true"))
 	UOWHQuestsManager* QuestManagerComponent;
+
+	/** Dialogue comp */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Recipe, meta = (AllowPrivateAccess = "true"))
+	UOWHDialogueComponent* DialogueComponent;
 
 	/** MappingContext */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
