@@ -18,7 +18,7 @@ bool UOWHGameplayAbility_Talk::CanActivateAbility(const FGameplayAbilitySpecHand
         return false;
     }
 
-    if (AOWHCharacter* Character = Cast<AOWHCharacter>(ActorInfo->AvatarActor.Get()))
+    if (AOWHCharacter* Character = Cast<AOWHCharacter>(ActorInfo->OwnerActor.Get()))
     {
         return GetDialogueInterfaceActor(Character) != nullptr;
     }
