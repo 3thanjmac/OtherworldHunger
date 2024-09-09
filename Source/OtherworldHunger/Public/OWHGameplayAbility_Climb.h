@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "OWHGameplayAbility.h"
 #include "OWHGameplayAbility_Climb.generated.h"
- 
+
 /**
  * 
  */
