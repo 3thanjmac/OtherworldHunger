@@ -3,6 +3,12 @@
 
 #include "Dialogues/DialogueWidget.h"
 
+UDialogueWidget::UDialogueWidget(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	bIsFocusable = true;
+}
+
 void UDialogueWidget::StartDialogue(const FString& DialogueID)
 {
 	SetVisibility(ESlateVisibility::Visible);
