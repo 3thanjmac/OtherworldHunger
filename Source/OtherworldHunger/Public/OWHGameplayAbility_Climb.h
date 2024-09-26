@@ -26,6 +26,4 @@ private:
 private:
 	UPROPERTY(EditDefaultsOnly, Category = Climb, meta = (AllowPrivateAccess = "true"))
 	float AttachmentDistance = 100;
-
-	bool TerminateClimb = false;
 };

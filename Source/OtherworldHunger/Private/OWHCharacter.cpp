@@ -123,8 +123,16 @@ void AOWHCharacter::Move(const FInputActionValue& Value)
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
+		if (bIsClimbing)
+		{
+			AddMovementInput(GetActorUpVector(), MovementVector.Y);
+			AddMovementInput(GetActorRightVector(), MovementVector.X);
+		}
+		else
+		{
+			AddMovementInput(ForwardDirection, MovementVector.Y);
+			AddMovementInput(RightDirection, MovementVector.X);
+		}
 	}
 }
 
@@ -141,7 +149,7 @@ void AOWHCharacter::Look(const FInputActionValue& Value)
 
 void AOWHCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (!bIsClimbing)
+	if (!bIsClimbing && GetCharacterMovement()->IsFalling())
 	{
 		GetOWHAbilitySystemComponent()->ActivateAbilityByTag(Climb);
 	}

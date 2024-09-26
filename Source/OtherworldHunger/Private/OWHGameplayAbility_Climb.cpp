@@ -27,8 +27,14 @@ bool UOWHGameplayAbility_Climb::CanActivateAbility(const FGameplayAbilitySpecHan
 		FHitResult HitResult;
 
 		OwnerCharacter->GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Visibility);
+		GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Green, FString::Printf(TEXT("X: %f, Y: %f, Z: %f"), HitResult.Normal.X, HitResult.Normal.Y, HitResult.Normal.Z));
+
 
 		if (HitResult.bBlockingHit == false)
+		{
+			return false;
+		}
+		else if (HitResult.Normal.Z > 0.7)
 		{
 			return false;
 		}
@@ -62,9 +68,8 @@ void UOWHGameplayAbility_Climb::StartClimb(ACharacter* OwnerCharacter)
 {
 	if (UCharacterMovementComponent* CharacterMovementComponent = OwnerCharacter->GetCharacterMovement())
 	{
-		FVector StartTrace = OwnerCharacter->GetActorLocation() - OwnerCharacter->GetActorUpVector() * OwnerCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+		FVector StartTrace = OwnerCharacter->GetActorLocation();
 		FVector EndTrace = StartTrace + OwnerCharacter->GetActorForwardVector() * AttachmentDistance;
-
 		FHitResult HitResult;
 
 		OwnerCharacter->GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Visibility);
@@ -73,11 +78,11 @@ void UOWHGameplayAbility_Climb::StartClimb(ACharacter* OwnerCharacter)
 		{
 			CharacterMovementComponent->SetMovementMode(MOVE_Flying);
 			CharacterMovementComponent->bOrientRotationToMovement = false;
+			OwnerCharacter->SetActorRotation(FRotator(UKismetMathLibrary::MakeRotFromX(-HitResult.Normal)));
 
 			UCapsuleComponent* PlayerCapsule = OwnerCharacter->GetCapsuleComponent();
 
 			FVector AttachLocation = HitResult.Location + PlayerCapsule->GetUnscaledCapsuleRadius() * HitResult.Normal;
-
 			UKismetSystemLibrary::MoveComponentTo(PlayerCapsule, AttachLocation, UKismetMathLibrary::MakeRotFromX(-HitResult.Normal), false, false, 0.2f, false, EMoveComponentAction::Type::Move, FLatentActionInfo());
 
 			DoClimb(OwnerCharacter);
@@ -89,10 +94,8 @@ void UOWHGameplayAbility_Climb::DoClimb(ACharacter* OwnerCharacter)
 {
 	if (UCharacterMovementComponent* CharacterMovementComponent = OwnerCharacter->GetCharacterMovement())
 	{
-		
 		FVector StartTrace = OwnerCharacter->GetActorLocation() - OwnerCharacter->GetActorUpVector() * OwnerCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
 		FVector EndTrace = StartTrace + OwnerCharacter->GetActorForwardVector() * AttachmentDistance;
-
 		FHitResult HitResult;
 
 		OwnerCharacter->GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Visibility);
@@ -100,12 +103,10 @@ void UOWHGameplayAbility_Climb::DoClimb(ACharacter* OwnerCharacter)
 
 		if (HitResult.bBlockingHit)
 		{
-			OwnerCharacter->AddMovementInput(OwnerCharacter->GetActorUpVector(), 1);
 			OwnerCharacter->GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UOWHGameplayAbility_Climb::DoClimb, OwnerCharacter));
 		}
 		else
 		{
-			OwnerCharacter->AddMovementInput(OwnerCharacter->GetActorForwardVector(), 1);
 			if (UOWHAbilitySystemComponent* OwningAbilityComponent = Cast<UOWHAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwningActorFromActorInfo())))
 			{
 				OwningAbilityComponent->CancelAbilityByClass(GetClass());
