@@ -33,12 +33,6 @@ bool UOWHGameplayAbility_Cook::CanActivateAbility(const FGameplayAbilitySpecHand
 
 	if (OwnerCharacter == nullptr) { return false; }
 
-	if (OwnerCharacter->GetWorld()->GetTimerManager().IsTimerActive(Cooking_TimeHandle))
-	{
-		OwnerCharacter->ShowNotification("Cooking Pot is busy please wait", ENotificationType::EWarning);
-		return false;
-	}
-
 	TArray<AActor*> OverlappingActors;
 	OwnerCharacter->GetOverlappingActors(OverlappingActors, AOWHCookingPot::StaticClass());
 
@@ -97,8 +91,6 @@ void UOWHGameplayAbility_Cook::ActivateAbility(const FGameplayAbilitySpecHandle 
 						OwnerCharacter->ShowNotification("Cooking Started", ENotificationType::EMessage);
 						CookingPOT->Cook(true);
 					}
-
-					OwnerCharacter->GetWorld()->GetTimerManager().SetTimer(Cooking_TimeHandle, this, &UOWHGameplayAbility_Cook::FinishCooking, CookingTime, false);
 				}
 			}
 		}
@@ -124,9 +116,4 @@ void UOWHGameplayAbility_Cook::EndAbility(const FGameplayAbilitySpecHandle Handl
 	}
 
 	RecipeManagerRef->LoadRecipe();
-}
-
-void UOWHGameplayAbility_Cook::FinishCooking()
-{
-	K2_CancelAbility();
 }
