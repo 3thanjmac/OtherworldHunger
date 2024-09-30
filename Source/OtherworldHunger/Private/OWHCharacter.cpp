@@ -281,6 +281,20 @@ void AOWHCharacter::StopSFX(const FGameplayTag& AudioTag)
 	AudioManager->StopSound(AudioTag);
 }
 
+void AOWHCharacter::TaperOnSFX()
+{
+	if (GetAudioManager() == nullptr) { return; }
+
+	AudioManager->TaperOn();
+}
+
+void AOWHCharacter::TaperOffSFX()
+{
+	if (GetAudioManager() == nullptr) { return; }
+
+	AudioManager->TaperOff();
+}
+
 float AOWHCharacter::FallDamage(float Velocity)
 {
 	/* Min velocity for fall damage set by addend */

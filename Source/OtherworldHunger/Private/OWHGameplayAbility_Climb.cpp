@@ -27,8 +27,6 @@ bool UOWHGameplayAbility_Climb::CanActivateAbility(const FGameplayAbilitySpecHan
 		FHitResult HitResult;
 
 		OwnerCharacter->GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Visibility);
-		GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Green, FString::Printf(TEXT("X: %f, Y: %f, Z: %f"), HitResult.Normal.X, HitResult.Normal.Y, HitResult.Normal.Z));
-
 
 		if (HitResult.bBlockingHit == false)
 		{
@@ -99,7 +97,18 @@ void UOWHGameplayAbility_Climb::DoClimb(ACharacter* OwnerCharacter)
 		FHitResult HitResult;
 
 		OwnerCharacter->GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Visibility);
-		Cast<AOWHCharacter>(OwnerCharacter)->SetIsClimbing(true);
+		if (AOWHCharacter* OWHCharacter = Cast<AOWHCharacter>(OwnerCharacter))
+		{
+			OWHCharacter->SetIsClimbing(true);
+			if (CharacterMovementComponent->Velocity.IsZero())
+			{
+				OWHCharacter->TaperOffSFX();
+			}
+			else
+			{
+				OWHCharacter->TaperOnSFX();
+			}
+		}
 
 		if (HitResult.bBlockingHit)
 		{

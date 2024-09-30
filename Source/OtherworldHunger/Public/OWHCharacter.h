@@ -43,6 +43,8 @@ public:
 	/** Audio */
 	void PlaySFX(const FGameplayTag& AudioTag);
 	void StopSFX(const FGameplayTag& AudioTag);
+	void TaperOnSFX();
+	void TaperOffSFX();
 
 	/** Getters */
 	class UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
