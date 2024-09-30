@@ -2,6 +2,7 @@
 
 
 #include "Dialogues/DialogueWidget.h"
+#include "Dialogues/OWHDialogueComponent.h"
 
 UDialogueWidget::UDialogueWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -9,17 +10,17 @@ UDialogueWidget::UDialogueWidget(const FObjectInitializer& ObjectInitializer)
 	bIsFocusable = true;
 }
 
-void UDialogueWidget::StartDialogue(const FString& DialogueID)
+void UDialogueWidget::StartDialogue(const FString& NPC_ID)
 {
 	SetVisibility(ESlateVisibility::Visible);
 }
 
-void UDialogueWidget::NextDialogue(const FString& DialogueID, const FString& Dialogue)
+void UDialogueWidget::NextDialogue(const FString& NPC_ID, const FDialogueData& DialogueData)
 {
-	ShowDialogue(Dialogue);
+	ShowDialogue(DialogueData);
 }
 
-void UDialogueWidget::EndDialogue(const FString& DialogueID)
+void UDialogueWidget::EndDialogue(const FString& NPC_ID)
 {
 	SetVisibility(ESlateVisibility::Collapsed);
 }
