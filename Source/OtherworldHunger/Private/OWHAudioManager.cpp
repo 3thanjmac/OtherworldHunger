@@ -57,3 +57,12 @@ void AOWHAudioManager::StopSound(const FGameplayTag& AudioTag)
 	SfxAudioComponent->Stop();
 }
 
+void AOWHAudioManager::TaperOn()
+{
+	SfxAudioComponent->AdjustVolume(0.1f, 1.0f, EAudioFaderCurve::Sin);
+}
+
+void AOWHAudioManager::TaperOff()
+{
+	SfxAudioComponent->AdjustVolume(0.1f, 0.0f, EAudioFaderCurve::Sin);
+}

@@ -20,6 +20,8 @@ public:
 	void StartLevel();
 	void PlaySound(const FGameplayTag& AudioTag);
 	void StopSound(const FGameplayTag& AudioTag);
+	void TaperOn();
+	void TaperOff();
 
 public:
 	UPROPERTY(EditAnywhere)

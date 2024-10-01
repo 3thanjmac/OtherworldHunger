@@ -26,13 +26,13 @@ public:
 	UTextBlock* DialogueText = nullptr;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void ShowDialogue(const FString& Dialogue);
+	void ShowDialogue(const FDialogueData& DialogueData);
 
 	UFUNCTION(BlueprintCallable)
 	void StartDialogue(const FString& DialogueID);
 
 	UFUNCTION(BlueprintCallable)
-	void NextDialogue(const FString& DialogueID, const FString& Dialogue);
+	void NextDialogue(const FString& DialogueID, const FDialogueData& DialogueData);
 
 	UFUNCTION(BlueprintCallable)
 	void EndDialogue(const FString& DialogueID);

@@ -8,17 +8,43 @@
 #include "OWHDialogueComponent.generated.h"
 
 USTRUCT(BlueprintType)
-struct FDialogueData : public FTableRowBase
+struct FDialogueData
 {
 	GENERATED_BODY();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogues")
-	TArray<FString> Dialogues;
+public:
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogues")
+	int DialogueIndex = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogues")
+	FString Dialogue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogues")
+	TMap<FString, int> ResponsesToNextDialogueIndex;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDialogueNotifyDelegate, const FString&, DialogueID, const FString&, Dialogue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDialogueDelegate, const FString&, DialogueID);
+USTRUCT(BlueprintType)
+struct FDialogueDataPerNPC : public FTableRowBase
+{
+	GENERATED_BODY();
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogues")
+	FString SpeakerName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogues")
+	bool bCanRestartDialogue = false;
+
+	// Every NPC in the Data Table will have this array.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogues")
+	TArray<FDialogueData> DialogueDataArray;
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDialogueNotifyDelegate, const FString&, NPC_ID, const FDialogueData&, Dialogue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDialogueDelegate, const FString&, NPC_ID);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDialogueStartDelegate, const FString&, NPC_ID, const FString&, SpeakerName);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class OTHERWORLDHUNGER_API UOWHDialogueComponent : public UActorComponent
@@ -29,10 +55,16 @@ public:
 	UOWHDialogueComponent();
 
 	UFUNCTION(BlueprintCallable)
-	void StartDialogue(FString InDialogueID);
+	void StartDialogue(const FString& InNPC_ID);
 
 	UFUNCTION(BlueprintCallable)
-	void GoToNextDialogue();
+	void GoToNextDialogue(int NextDialogueIndex);
+
+	UFUNCTION(BlueprintCallable)
+	int GetNextDialogueIndexForResponse(int CurrentDialogueIndex, const FString& Response) const;
+
+	UFUNCTION(BlueprintCallable)
+	void EndDialogue(const FString& InNPC_ID);
 
 	UFUNCTION(BlueprintCallable)
 	bool IsInDialogue() const { return bIsInDialogue; }
@@ -42,17 +74,20 @@ public:
 
 	bool bIsInDialogue = false;
 
-	FString DialogueID;
-	TArray<FString> CurrentDialogues;
+	FString NPC_ID;
+	FDialogueDataPerNPC* CurrentDialogues;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FDialogueDelegate OnStartDialogue;
+	FDialogueStartDelegate OnStartDialogue;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FDialogueNotifyDelegate OnNextDialogue;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FDialogueDelegate OnEndDialogue;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<FString> FinishedDialogueIDs;
 
 protected:
 	virtual void BeginPlay() override;
