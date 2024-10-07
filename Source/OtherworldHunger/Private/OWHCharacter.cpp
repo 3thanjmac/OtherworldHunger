@@ -5,6 +5,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "Actors/OWHIngredient.h"
 #include "BasicAttributeSet.h"
+#include "StatsAttributeSet.h"
 #include "Camera/CameraComponent.h"
 #include "EngineUtils.h"
 #include "EnhancedInputComponent.h"
@@ -59,6 +60,7 @@ void AOWHCharacter::BeginPlay()
 	if (IsValid(AbilitySystemComponent))
 	{
 		Attributes = AbilitySystemComponent->GetSet<UBasicAttributeSet>();
+		StatsAttributeSet = AbilitySystemComponent->GetSet<UStatsAttributeSet>();
 	}
 }
 
