@@ -7,7 +7,7 @@
 UDialogueWidget::UDialogueWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	bIsFocusable = true;
+	//bIsFocusable = true;
 }
 
 void UDialogueWidget::StartDialogue(const FString& NPC_ID)
