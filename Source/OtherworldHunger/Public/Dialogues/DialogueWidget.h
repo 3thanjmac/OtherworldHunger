@@ -17,6 +17,7 @@ class OTHERWORLDHUNGER_API UDialogueWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+
 	UDialogueWidget(const FObjectInitializer& ObjectInitializer);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue", meta = (BindWidget))

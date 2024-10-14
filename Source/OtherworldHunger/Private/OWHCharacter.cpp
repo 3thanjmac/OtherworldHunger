@@ -3,6 +3,7 @@
 
 #include "OWHCharacter.h"
 #include "Abilities/GameplayAbility.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "Actors/OWHIngredient.h"
 #include "BasicAttributeSet.h"
 #include "StatsAttributeSet.h"
@@ -61,6 +62,45 @@ void AOWHCharacter::BeginPlay()
 	{
 		Attributes = AbilitySystemComponent->GetSet<UBasicAttributeSet>();
 		StatsAttributeSet = AbilitySystemComponent->GetSet<UStatsAttributeSet>();
+	}
+}
+
+void AOWHCharacter::GiveXP(int XP)
+{
+	if (AbilitySystemComponent && XPEffect)
+	{
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(XPEffect, 1.0f, AbilitySystemComponent->MakeEffectContext());
+		FGameplayEffectSpecHandle Spec = UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, XPTag, XP);
+		if (Spec.IsValid())
+		{
+			AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*Spec.Data.Get());
+		}
+	}
+}
+
+void AOWHCharacter::SetLevel(int Level)
+{
+	if (AbilitySystemComponent && LevelEffect)
+	{
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(LevelEffect, 1.0f, AbilitySystemComponent->MakeEffectContext());
+		FGameplayEffectSpecHandle Spec = UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, LevelTag, Level);
+		if (Spec.IsValid())
+		{
+			AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*Spec.Data.Get());
+		}
+	}
+}
+
+void AOWHCharacter::GivePoints(int Points)
+{
+	if (AbilitySystemComponent && PointsEffect)
+	{
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(PointsEffect, 1.0f, AbilitySystemComponent->MakeEffectContext());
+		FGameplayEffectSpecHandle Spec = UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, PointsTag, Points);
+		if (Spec.IsValid())
+		{
+			AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*Spec.Data.Get());
+		}
 	}
 }
 

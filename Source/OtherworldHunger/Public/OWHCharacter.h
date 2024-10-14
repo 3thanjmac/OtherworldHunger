@@ -13,7 +13,20 @@
 #include "OWHConfirmUIScreen.h"
 #include "OWHCharacter.generated.h"
 
+USTRUCT(BlueprintType)
+struct FGiveStatsData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag StatTag; // Example Stat.XP.Cook or Stat.Points.LevelUp
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 Amount = 0;
+};
+
 class UOWHDialogueComponent;
+class UGameplayEffect;
 
 UCLASS()
 class OTHERWORLDHUNGER_API AOWHCharacter : public ACharacter, public IAbilitySystemInterface
@@ -72,6 +85,40 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float FallDamage(float Velocity);
 
+	/** Stats **/
+	UFUNCTION(BlueprintCallable)
+	const TArray<int32>& GetXPToReachNextLevelArray() const { return XPToReachNextLevel; }
+
+	UFUNCTION(BlueprintCallable)
+	void GiveXP(int XP);
+
+	UFUNCTION(BlueprintCallable)
+	void SetLevel(int Level);
+
+	UFUNCTION(BlueprintCallable)
+	void GivePoints(int Points);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
+	int PointsGrantedPerLevel = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
+	FGameplayTag XPTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
+	FGameplayTag LevelTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
+	FGameplayTag PointsTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
+	TSubclassOf<UGameplayEffect> XPEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
+	TSubclassOf<UGameplayEffect> LevelEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
+	TSubclassOf<UGameplayEffect> PointsEffect;
+
 protected:
 	virtual void PossessedBy(AController* NewController) override;
 
@@ -92,6 +139,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS", meta = (AllowPrivateAccess = "true"))
 	const class UStatsAttributeSet* StatsAttributeSet;
+
+	// If XP crosses the amount of the 'index' level,
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
+	TArray<int32> XPToReachNextLevel;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivateAccess = "true"))
