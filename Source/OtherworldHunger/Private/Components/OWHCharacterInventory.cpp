@@ -16,26 +16,55 @@ void UOWHCharacterInventory::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UOWHCharacterInventory::AddIngredient(const FGameplayTag& Ingredient)
+void UOWHCharacterInventory::AddIngredient(UOWHItem* AddedItem)
 {
+	if (AddedItem == nullptr) { return; }
+	FGameplayTag Ingredient = AddedItem->NameTag;
 	for (TPair<FGameplayTag, int32>& Pair : IngredientMap)
 	{
 		if (Pair.Key.IsValid() == false) { continue; }
 
 		if (Pair.Key == Ingredient)
 		{
-			Pair.Value++;
-
-			if (AOWHCharacter* OwnerCharacter = Cast<AOWHCharacter>(GetOwner()))
+			for (FItemSlot& CheckSlot : InventorySlots)
 			{
-				OwnerCharacter->OnIngredientAddedToInventory(Ingredient, IngredientMap[Ingredient]);
-			}
+				if (CheckSlot.HasItem)
+				{
+					if (CheckSlot.ItemAsset == AddedItem && CheckSlot.StackSize < AddedItem->MaxStackSize)
+					{
+						CheckSlot.StackSize++;
+						Pair.Value++;
+						if (AOWHCharacter* OwnerCharacter = Cast<AOWHCharacter>(GetOwner()))
+						{
+							OwnerCharacter->OnIngredientAddedToInventory(Ingredient, IngredientMap[Ingredient]);
+						}
 
-			return;
+						OnSetItem.Broadcast();
+						return;
+					}
+				}
+				else { continue; }
+			}
 		}
 	}
 
 	IngredientMap.Add(Ingredient, 1);
+
+	for (FItemSlot& CheckSlot : InventorySlots)
+	{
+		if (!CheckSlot.HasItem)
+		{
+			CheckSlot.HasItem = true;
+			CheckSlot.StackSize++;
+			CheckSlot.ItemAsset = AddedItem;
+			OnSetItem.Broadcast();
+			return;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Inventory Full!"));
+		}
+	}
 
 	if (AOWHCharacter* OwnerCharacter = Cast<AOWHCharacter>(GetOwner()))
 	{
@@ -75,7 +104,20 @@ bool UOWHCharacterInventory::HasIngredients(TMap<FGameplayTag, int32> Ingredient
 
 void UOWHCharacterInventory::RemoveIngredient(AOWHIngredient* Ingredient)
 {
-	FGameplayTag IngredientTag = Ingredient->GetIngredientTag();
+	FItemSlot* ItemPtr = InventorySlots.FindByKey(Ingredient->GetIngredientAsset());
+	if (ItemPtr->StackSize > 1)
+	{
+		ItemPtr->StackSize -= 1;
+	}
+	else
+	{
+		FItemSlot EmptySlot;
+		*ItemPtr = EmptySlot;
+	}
+
+	OnSetItem.Broadcast();
+
+	FGameplayTag IngredientTag = Ingredient->GetIngredientAsset()->NameTag;
 
 	if (IngredientTag.IsValid() == false) { return; }
 

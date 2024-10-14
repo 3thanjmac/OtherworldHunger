@@ -6,6 +6,7 @@
 #include "OWHInteractableInterface.h"
 #include "GameFramework/Actor.h"
 #include "GameplayTagContainer.h"
+#include "Components/OWHItem.h"
 #include "OWHIngredient.generated.h"
 
 class USphereComponent;
@@ -18,14 +19,17 @@ class OTHERWORLDHUNGER_API AOWHIngredient : public AActor, public IOWHInteractab
 public:
 	AOWHIngredient();
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UOWHItem* ItemDataAsset;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* IngredientMesh;
+
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* InteractSphere;
 
 protected:
 	virtual AActor* Interact_Implementation(APawn* InstigatorPawn) override;
-
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag IngredientTag;
@@ -34,16 +38,19 @@ protected:
 public:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UFUNCTION(BlueprintGetter)
-	FGameplayTag GetIngredientTag() const;
+	UOWHItem* GetIngredientAsset() const;
+
 	UFUNCTION(BlueprintSetter)
 	void SetIngredientTag(const FGameplayTag& InIngredientTag);
+
 	UFUNCTION(BlueprintSetter)
 	void SetIngredientMesh(UStaticMeshComponent* IngredientMeshComp);
+
 };

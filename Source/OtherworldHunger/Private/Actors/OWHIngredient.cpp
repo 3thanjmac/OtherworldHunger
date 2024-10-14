@@ -31,7 +31,7 @@ AActor* AOWHIngredient::Interact_Implementation(APawn* InstigatorPawn)
 
 	if (OwnerCharacter && OwnerCharacter->GetCharacterInventory())
 	{
-		OwnerCharacter->GetCharacterInventory()->AddIngredient(GetIngredientTag());
+		OwnerCharacter->GetCharacterInventory()->AddIngredient(GetIngredientAsset());
 		IngredientMesh->DestroyComponent();
 		InteractSphere->DestroyComponent();
 		OwnerCharacter->GetCharacterInventory()->DisplayIngredients();
@@ -54,9 +54,14 @@ void AOWHIngredient::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* O
 	UE_LOG(LogTemp, Warning, TEXT("Overlap Ended"));
 }
 
-FGameplayTag AOWHIngredient::GetIngredientTag() const
+UOWHItem* AOWHIngredient::GetIngredientAsset() const
 {
-	return IngredientTag;
+	if (ItemDataAsset == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ItemDataAsset not provided for this ingredient."));
+		return nullptr;
+	}
+	return ItemDataAsset;
 }
 
 void AOWHIngredient::SetIngredientTag(const FGameplayTag& InIngredientTag)
