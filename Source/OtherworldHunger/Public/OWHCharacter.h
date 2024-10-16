@@ -101,6 +101,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void GivePoints(int Points);
 
+	UFUNCTION(BlueprintCallable)
+	bool GiveSkill(FGameplayTag SkillTag, int PointsNeeded);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnNewSkillAdded(FGameplayTag SkillTag);
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
 	int PointsGrantedPerLevel = 5;
 
@@ -150,6 +156,10 @@ protected:
 	// Value = Skill GameplayTag, Key = RequiredSkillTags before it can be unlocked
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
 	TMap<FGameplayTag, FGameplayTagContainer> SkillTreeDependencies;
+
+	// Tags for the aqcuired skills.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
+	FGameplayTagContainer AcquiredSkills;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivateAccess = "true"))

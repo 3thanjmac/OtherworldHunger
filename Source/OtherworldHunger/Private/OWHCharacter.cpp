@@ -104,6 +104,41 @@ void AOWHCharacter::GivePoints(int Points)
 	}
 }
 
+bool AOWHCharacter::GiveSkill(FGameplayTag SkillTag, int PointsNeeded)
+{
+	if (AcquiredSkills.HasTagExact(SkillTag) || PointsNeeded < 0)
+	{
+		return false;
+	}
+
+	if (StatsAttributeSet && GetAbilitySystemComponent())
+	{
+		bool bFound = false;
+		const int CurrentPoints = (int)GetAbilitySystemComponent()->GetGameplayAttributeValue(StatsAttributeSet->GetPointsAttribute(), bFound);
+
+		if (PointsNeeded == 0 || (bFound && CurrentPoints >= PointsNeeded))
+		{
+			// Deduct the points.
+			GivePoints(-PointsNeeded);
+
+			// Perform any functionality to increase/decrease stats, give player items, etc for the skill.
+			OnNewSkillAdded(SkillTag);
+
+			// Add it to the acquired skills.
+			AcquiredSkills.AddTag(SkillTag);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void AOWHCharacter::OnNewSkillAdded_Implementation(FGameplayTag SkillTag)
+{
+	// Grant player health, inventory, etc, etc, based on the Tag. (Can be overriden in Blueprints too.
+	UE_LOG(LogTemp, Warning, TEXT("New Skill Added: %s"), *SkillTag.ToString());
+}
+
 void AOWHCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);

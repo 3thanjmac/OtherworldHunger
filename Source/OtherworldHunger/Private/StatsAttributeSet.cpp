@@ -13,9 +13,6 @@ void UStatsAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
 
-	UE_LOG(LogTemp, Warning, TEXT("-----------------"));
-	UE_LOG(LogTemp, Warning, TEXT("Old: %f | New: %f"), OldValue, NewValue);
-
 	// If XP Changes.
 	if (Attribute == GetXPAttribute())
 	{
@@ -52,14 +49,14 @@ void UStatsAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute
 	}
 	else if (Attribute == GetLevelAttribute())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Level UP!!!"));
+		int PlayerLevel = (int)GetLevel();
+		UE_LOG(LogTemp, Warning, TEXT("Level Up to %d"), PlayerLevel);
 
 		if (AOWHCharacter* Character = Cast<AOWHCharacter>(GetOwningActor()))
 		{
 			int PointsPerLevel = Character->PointsGrantedPerLevel;
 			if (PointsPerLevel > 0)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Points Granted: %d"), PointsPerLevel);
 				SetPoints(GetPoints() + PointsPerLevel);
 			}
 		}
@@ -68,8 +65,4 @@ void UStatsAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Points Given: %f"), NewValue - OldValue);
 	}
-
-	// Get the XP threshold for Level + 1 and increase level if possible.
-
-	// On Level increase, award points.
 }
