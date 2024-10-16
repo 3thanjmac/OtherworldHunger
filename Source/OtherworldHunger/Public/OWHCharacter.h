@@ -90,6 +90,9 @@ public:
 	const TArray<int32>& GetXPToReachNextLevelArray() const { return XPToReachNextLevel; }
 
 	UFUNCTION(BlueprintCallable)
+	const TMap<FGameplayTag, FGameplayTagContainer>& GetSkillTreeDependencies() const { return SkillTreeDependencies; }
+
+	UFUNCTION(BlueprintCallable)
 	void GiveXP(int XP);
 
 	UFUNCTION(BlueprintCallable)
@@ -143,6 +146,10 @@ protected:
 	// If XP crosses the amount of the 'index' level,
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
 	TArray<int32> XPToReachNextLevel;
+
+	// Value = Skill GameplayTag, Key = RequiredSkillTags before it can be unlocked
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
+	TMap<FGameplayTag, FGameplayTagContainer> SkillTreeDependencies;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivateAccess = "true"))
