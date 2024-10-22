@@ -20,7 +20,10 @@ public:
 	FGameplayTag NameTag;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	int ID;
+	FString NameString;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FString Description;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int MaxStackSize = 16;

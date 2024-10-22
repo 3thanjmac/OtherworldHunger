@@ -23,9 +23,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UOWHItem* ItemAsset;
 
-	bool operator==(UOWHItem* Other)
+	bool operator==(FGameplayTag Other)
 	{
-		return this->ItemAsset == Other;
+		return this->ItemAsset->NameTag == Other;
 	}
 };
 
@@ -45,7 +45,10 @@ public:
 	void AddIngredient(UOWHItem* AddedItem);
 
 	UFUNCTION(BlueprintCallable)
-	void RemoveIngredient(AOWHIngredient* Ingredient);
+	void AddItem(UOWHItem* AddedItem);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveIngredient(const FGameplayTag& IngredientTag);
 
 	bool HasIngredients(TMap<FGameplayTag, int32> Ingredients);
 
@@ -59,14 +62,32 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FAddItemDelegate OnSetItem;
 
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FAddItemDelegate OnSetWeapon;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FAddItemDelegate OnSetFood;
+
 	UPROPERTY(BlueprintReadWrite)
 	TMap<FGameplayTag, int32> IngredientMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FItemSlot> InventorySlots;
+	TArray<FItemSlot> ItemSlots;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int InventorySize = 16;
+	TArray<FItemSlot> WeaponSlots;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FItemSlot> FoodSlots;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int ItemInvSize = 16;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int WeaponInvSize = 4;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int FoodInvSize = 16;
 
 protected:
 	virtual void BeginPlay() override;

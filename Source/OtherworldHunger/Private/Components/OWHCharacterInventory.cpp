@@ -2,6 +2,7 @@
 
 
 #include "Components/OWHCharacterInventory.h"
+#include "GameplayTagsManager.h"
 #include "OWHCharacter.h"
 
 
@@ -19,6 +20,7 @@ void UOWHCharacterInventory::BeginPlay()
 void UOWHCharacterInventory::AddIngredient(UOWHItem* AddedItem)
 {
 	if (AddedItem == nullptr) { return; }
+
 	FGameplayTag Ingredient = AddedItem->NameTag;
 	for (TPair<FGameplayTag, int32>& Pair : IngredientMap)
 	{
@@ -26,7 +28,7 @@ void UOWHCharacterInventory::AddIngredient(UOWHItem* AddedItem)
 
 		if (Pair.Key == Ingredient)
 		{
-			for (FItemSlot& CheckSlot : InventorySlots)
+			for (FItemSlot& CheckSlot : ItemSlots)
 			{
 				if (CheckSlot.HasItem)
 				{
@@ -50,7 +52,7 @@ void UOWHCharacterInventory::AddIngredient(UOWHItem* AddedItem)
 
 	IngredientMap.Add(Ingredient, 1);
 
-	for (FItemSlot& CheckSlot : InventorySlots)
+	for (FItemSlot& CheckSlot : ItemSlots)
 	{
 		if (!CheckSlot.HasItem)
 		{
@@ -69,6 +71,52 @@ void UOWHCharacterInventory::AddIngredient(UOWHItem* AddedItem)
 	if (AOWHCharacter* OwnerCharacter = Cast<AOWHCharacter>(GetOwner()))
 	{
 		OwnerCharacter->OnIngredientAddedToInventory(Ingredient, IngredientMap[Ingredient]);
+	}
+}
+
+void UOWHCharacterInventory::AddItem(UOWHItem* AddedItem)
+{
+	if (AddedItem->NameTag.ToString().StartsWith("Weapon", ESearchCase::IgnoreCase))
+	{
+		for (FItemSlot& CheckSlot : WeaponSlots)
+		{
+			if (!CheckSlot.HasItem)
+			{
+				CheckSlot.HasItem = true;
+				CheckSlot.StackSize = 1;
+				CheckSlot.ItemAsset = AddedItem;
+				OnSetWeapon.Broadcast();
+				return;
+			}
+		}
+	}
+	else
+	{
+		for (FItemSlot& CheckSlot : FoodSlots)
+		{
+			if (CheckSlot.HasItem)
+			{
+				if (CheckSlot.ItemAsset == AddedItem && CheckSlot.StackSize < AddedItem->MaxStackSize)
+				{
+					CheckSlot.StackSize++;
+					OnSetFood.Broadcast();
+					return;
+				}
+			}
+			else { continue; }
+		}
+
+		for (FItemSlot& CheckSlot : FoodSlots)
+		{
+			if (!CheckSlot.HasItem)
+			{
+				CheckSlot.HasItem = true;
+				CheckSlot.StackSize++;
+				CheckSlot.ItemAsset = AddedItem;
+				OnSetFood.Broadcast();
+				return;
+			}
+		}
 	}
 }
 
@@ -102,23 +150,8 @@ bool UOWHCharacterInventory::HasIngredients(TMap<FGameplayTag, int32> Ingredient
 	return true;
 }
 
-void UOWHCharacterInventory::RemoveIngredient(AOWHIngredient* Ingredient)
+void UOWHCharacterInventory::RemoveIngredient(const FGameplayTag& IngredientTag)
 {
-	FItemSlot* ItemPtr = InventorySlots.FindByKey(Ingredient->GetIngredientAsset());
-	if (ItemPtr->StackSize > 1)
-	{
-		ItemPtr->StackSize -= 1;
-	}
-	else
-	{
-		FItemSlot EmptySlot;
-		*ItemPtr = EmptySlot;
-	}
-
-	OnSetItem.Broadcast();
-
-	FGameplayTag IngredientTag = Ingredient->GetIngredientAsset()->NameTag;
-
 	if (IngredientTag.IsValid() == false) { return; }
 
 	if (IngredientMap.Find(IngredientTag))
@@ -144,11 +177,19 @@ void UOWHCharacterInventory::RemoveIngredients(TMap<FGameplayTag, int32> Ingredi
 		{
 			if (Pair.Key == Ingredient.Key)
 			{
+				FItemSlot* SlotPtr = ItemSlots.FindByKey(Ingredient.Key);
+
+				SlotPtr->StackSize -= Ingredient.Value;
 				Pair.Value -= Ingredient.Value;
 
 				if (Pair.Value <= 0)
 				{
 					IngredientsToRemove.Add(Pair.Key);
+				}
+				if (SlotPtr->StackSize <= 0)
+				{
+					FItemSlot EmptySlot;
+					*SlotPtr = EmptySlot;
 				}
 			}
 		}
@@ -158,6 +199,8 @@ void UOWHCharacterInventory::RemoveIngredients(TMap<FGameplayTag, int32> Ingredi
 	{
 		IngredientMap.Remove(Ingredient);
 	}
+
+	OnSetItem.Broadcast();
 }
 
 int32 UOWHCharacterInventory::GetIngredientCount(const FGameplayTag& IngredientTag) const
