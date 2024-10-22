@@ -81,13 +81,13 @@ public:
 	TArray<FItemSlot> FoodSlots;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int ItemInvSize = 16;
+	int ItemInvSize = 6;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int WeaponInvSize = 4;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int FoodInvSize = 16;
+	int FoodInvSize = 4;
 
 protected:
 	virtual void BeginPlay() override;

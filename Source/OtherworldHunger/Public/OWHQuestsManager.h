@@ -30,16 +30,20 @@ public:
 	FString GetCurrentRecipeName() { return CurrentRecipeName; };
 	FRecipeDataTable* GetCurrentRecipe() { return CurrentRecipeName != "" ? Recipes[CurrentRecipeName] : nullptr; };
 
+	UFUNCTION(BlueprintCallable)
 	bool LoadRecipe();
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UDataTable* RecipeDataTable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
+	int32 CurrentRecipeIndex = -1;
 	
 	/** Cache player recipes */
 	TMap<FString, FRecipeDataTable*> Recipes;
 
 	TArray<FString> RecipesNames;
 	FString CurrentRecipeName = "";
-	int32 CurrentRecipeIndex = -1;
+
 };
