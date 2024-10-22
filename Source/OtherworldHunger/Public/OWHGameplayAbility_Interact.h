@@ -22,7 +22,12 @@ public:
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility,
 	                        bool bWasCancelled) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction")
+	float InteractionRadius = 150.f;
+
 private:
 	void StartInteract(ACharacter* OwnerCharacter);
 	void DoInteract(ACharacter* OwnerCharacter);
+
+	void GetOverlappingActors(ACharacter* OwnerCharacter, TArray<AActor*>& InterfaceActors) const;
 };

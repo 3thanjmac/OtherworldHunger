@@ -10,6 +10,9 @@
 #include "OWHAbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Engine/OverlapResult.h"
+
 //#include "Dialogues/OWHDialogueInterface.h"
 
 
@@ -19,7 +22,7 @@ bool UOWHGameplayAbility_Interact::CanActivateAbility(const FGameplayAbilitySpec
 	ACharacter* OwnerCharacter = Cast<ACharacter>(ActorInfo->AvatarActor);
 
 	TArray<AActor*> OverlappingActors;
-	OwnerCharacter->GetOverlappingActors(OverlappingActors, UOWHInteractableInterface::StaticClass());
+	GetOverlappingActors(OwnerCharacter, OverlappingActors);
 
 	if (OverlappingActors.Num() == 0) { return false; }
 
@@ -72,7 +75,7 @@ void UOWHGameplayAbility_Interact::DoInteract(ACharacter* OwnerCharacter)
 	}
 
 	TArray<AActor*> OverlappingActors;
-	OWHCharacter->GetOverlappingActors(OverlappingActors, UOWHInteractableInterface::StaticClass());
+	GetOverlappingActors(OWHCharacter, OverlappingActors);
 
 	for (AActor* Actor : OverlappingActors)
 	{
@@ -100,4 +103,30 @@ void UOWHGameplayAbility_Interact::DoInteract(ACharacter* OwnerCharacter)
 	}
 
 	K2_CancelAbility();
+}
+
+void UOWHGameplayAbility_Interact::GetOverlappingActors(ACharacter* OwnerCharacter, TArray<AActor*>& InterfaceActors) const
+{
+	if (!OwnerCharacter)
+	{
+		return;
+	}
+	FCollisionObjectQueryParams ObjectParams;
+	ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
+	ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldDynamic);
+	ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+	ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_Destructible);
+	ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_Visibility);
+
+	TArray<FOverlapResult> Overlaps;
+
+	GetWorld()->OverlapMultiByObjectType(Overlaps, OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorQuat(), ObjectParams, FCollisionShape::MakeSphere(InteractionRadius));
+
+	for (const FOverlapResult& Overlap : Overlaps)
+	{
+		if (Overlap.GetActor() && Overlap.GetActor()->Implements<UOWHInteractableInterface>())
+		{
+			InterfaceActors.AddUnique(Overlap.GetActor());
+		}
+	}
 }
